@@ -1,0 +1,85 @@
+buildscript {
+    ext.http4k_version = '3.200.0'
+    ext.javax_annotation_version = '1.2'
+    ext.junit5_version = '3.3.2'
+    ext.kotlin_loggin_version = '1.7.8'
+    ext.kotlin_version = '1.3.61'
+    ext.logback_version = '1.2.3'
+    ext.logstash_encoder_version = '5.2'
+    ext.prometheus_version = '0.8.0'
+}
+
+plugins {
+    id 'application'
+    id 'com.github.ben-manes.versions' version '0.27.0'
+    id 'com.github.johnrengelman.shadow' version '5.1.0'
+    id 'idea'
+    id 'org.jetbrains.kotlin.jvm' version '1.3.61'
+    id 'org.jmailen.kotlinter' version '2.3.0'
+}
+
+group 'no.nav.arbeidsgiver'
+version '1.0-SNAPSHOT'
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'no.nav.arbeidsgiver.MainKt'
+    }
+}
+
+shadowJar {
+    archiveBaseName = 'app'
+    archiveClassifier = ''
+}
+
+application {
+    mainClassName = 'no.nav.arbeidsgiver.MainKt'
+}
+
+run {}
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+configurations {
+    all*.exclude group: 'org.slf4j', module: 'slf4j-log4j12'
+}
+
+dependencies {
+    compile "com.fasterxml.jackson.module:jackson-module-kotlin:2.10.+"
+    compile "com.oracle.ojdbc:ojdbc8:19.3.0.0"
+    compile 'com.github.seratch:kotliquery:1.3.0'
+    compile 'com.h2database:h2:1.4.197'
+    compileOnly "javax.annotation:javax.annotation-api:$javax_annotation_version"
+    implementation "ch.qos.logback:logback-classic:$logback_version"
+    implementation "io.github.microutils:kotlin-logging:$kotlin_loggin_version"
+    implementation "io.prometheus:simpleclient_common:$prometheus_version"
+    implementation "io.prometheus:simpleclient_hotspot:$prometheus_version"
+    implementation "net.logstash.logback:logstash-logback-encoder:$logstash_encoder_version"
+    implementation "org.http4k:http4k-client-apache:$http4k_version"
+    implementation "org.http4k:http4k-core:$http4k_version"
+    implementation "org.http4k:http4k-server-netty:$http4k_version"
+    implementation "org.jetbrains.kotlin:kotlin-script-runtime:1.3.61"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation "com.amazonaws:aws-java-sdk-s3:1.11.703"
+    testImplementation "io.findify:s3mock_2.12:0.2.5"
+    testImplementation "io.kotlintest:kotlintest-runner-junit5:$junit5_version"
+}
+
+test {
+    useJUnitPlatform()
+}
+
+sourceSets {
+    main.kotlin.srcDirs += 'src/main/kotlin'
+    test.kotlin.srcDirs += 'src/test/kotlin'
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "11"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "11"
+}

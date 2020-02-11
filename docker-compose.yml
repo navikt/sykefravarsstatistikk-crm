@@ -1,0 +1,18 @@
+version: '3'
+services:
+  app:
+    build: .
+    volumes:
+      - "./dvh-testdata:/app/dvh-testdata"
+  db:
+    image: postgres
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: example
+  s3:
+    image: adobe/s3mock
+    ports:
+    - 9090:9090
+    - 9091:9091

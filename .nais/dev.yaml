@@ -28,3 +28,8 @@ spec:
   webproxy: true
   ingresses:
     - https://sykefravarsstatistikk-crm.nais.preprod.local
+  env:
+    - name: JAVA_OPTS
+      value: "-Dlogback.configurationFile=logback-remote.xml"
+    - name: PORT
+      value: "8087"

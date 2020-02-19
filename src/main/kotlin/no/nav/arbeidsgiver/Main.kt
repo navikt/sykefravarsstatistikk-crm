@@ -1,9 +1,9 @@
 package no.nav.arbeidsgiver
 
-import mu.KotlinLogging
+import org.slf4j.LoggerFactory
 
 fun main() {
-    val log = KotlinLogging.logger {}
-    log.info { "Starting application" }
+    val log = LoggerFactory.getLogger("main")
+    log.info("Starting application")
     Bootstrap.start()
 }

@@ -9,4 +9,8 @@ object EnvVarFactory {
             if (envVar_ == null) envVar_ = EnvVar()
             return envVar_ ?: throw AssertionError("Environment factory, null for environment variables!")
         }
+
+    fun set(envVar: EnvVar) {
+        envVar_ = envVar
+    }
 }

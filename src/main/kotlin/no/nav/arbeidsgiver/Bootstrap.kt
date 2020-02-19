@@ -1,27 +1,26 @@
 package no.nav.arbeidsgiver
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import java.io.File
-import mu.KotlinLogging
 import no.nav.arbeidsgiver.model.SykefravarLeadScoring
+import org.slf4j.LoggerFactory
 
 object Bootstrap {
 
-    private val log = KotlinLogging.logger { }
+    private val log = LoggerFactory.getLogger(javaClass)
 
     fun start(ev: EnvVar = EnvVarFactory.envVar) {
-        if (ev.naisClusterName === Const.LOCALDEV) {
-            Dvh.loadTestData()
-        }
         Server.create(ev)
-        work(ev.naisClusterName === Const.DEV_FSS)
+        work()
     }
 
-    private fun work(limitSalesforcePush: Boolean) {
-        val existingData = Storage.loadData(Const.SYKEFRAVAERSTATS_FIL)
-        val outputStreamWriter = File(Const.SYKEFRAVAERSTATS_FIL).writer()
+    private fun work() {
+        val yesterdaysFile = S3Client.loadFromS3()
+        val existingData = Storage.loadData(yesterdaysFile)
+        val todaysFile = createTempFile()
+        val todaysFileWriter = todaysFile.writer()
         val haveChanged = ArrayList<SykefravarLeadScoring>()
         // Finner endrede rader
+        log.info("Starter å hente ut data fra dvh, har " + existingData.size + " rader fra tidligere kjøring.")
         Dvh.extractSykefravarStats({ potensielleDagsverk ->
             if (existingData.containsKey(potensielleDagsverk.orgnr)) {
                 if (existingData[potensielleDagsverk.orgnr] != potensielleDagsverk) {
@@ -30,24 +29,23 @@ object Bootstrap {
             } else {
                 haveChanged.add(potensielleDagsverk)
             }
-            outputStreamWriter.appendln(ObjectMapper().writeValueAsString(potensielleDagsverk))
-            existingData.remove(potensielleDagsverk.orgnr)
+            todaysFileWriter.appendln(ObjectMapper().writeValueAsString(potensielleDagsverk))
+            existingData.remove(potensielleDagsverk.orgnr) // fjerner fikset rad
         }, Dvh.extractStatsNaering())
-        outputStreamWriter.close()
+        todaysFileWriter.close()
         /**
          * Finner rader som skal nullsettes
          */
         existingData.forEach { (_, u) ->
-            haveChanged.add(SykefravarLeadScoring(u.orgnr, 0, 0, 0))
+            haveChanged.add(SykefravarLeadScoring(u.orgnr))
         }
         log.info("Skal endre: " + haveChanged.size)
         val chunks = haveChanged.chunked(200)
         if (chunks.isNotEmpty()) {
             chunks.forEach {
-                val requesting = Salesforce.createSObjectList(Const.SYKEFRAVAERSTATS_TOPIC, it)
-                Salesforce.postSObject(requesting)
-                if (limitSalesforcePush) return@forEach
+                SalesforceClient.postSObject(SalesforceClient.createSObjectList(Const.SYKEFRAVAERSTATS_TOPIC, it))
             }
         }
+        S3Client.persistToS3(todaysFile)
     }
 }

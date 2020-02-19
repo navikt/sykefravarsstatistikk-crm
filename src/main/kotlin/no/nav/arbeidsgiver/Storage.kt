@@ -8,9 +8,8 @@ import no.nav.arbeidsgiver.model.SykefravarLeadScoring
 
 object Storage {
 
-    fun loadData(filename: String): HashMap<String, SykefravarLeadScoring> {
+    fun loadData(file: File): HashMap<String, SykefravarLeadScoring> {
         val data = HashMap<String, SykefravarLeadScoring>()
-        val file = File(filename)
         val mapper = ObjectMapper().registerKotlinModule()
         if (file.exists()) {
             file.forEachLine {

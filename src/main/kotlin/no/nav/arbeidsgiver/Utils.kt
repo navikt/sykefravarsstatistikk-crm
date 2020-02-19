@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import java.io.File
+import java.time.LocalDateTime
 import kotlin.reflect.jvm.internal.impl.load.kotlin.JvmType
 
 object Utils {
@@ -24,5 +25,8 @@ object Utils {
     fun fromJson(string: String): Any {
         val mapper = ObjectMapper().registerKotlinModule()
         return mapper.readValue(string)
+    }
+    fun today(): Int {
+        return LocalDateTime.now().dayOfYear
     }
 }

@@ -9,7 +9,7 @@
 *.zip
 .gradle/
 .idea/
-.kotlintest
+.kotlintest/
 .mtj.tmp/
 build
 hs_err_pid*

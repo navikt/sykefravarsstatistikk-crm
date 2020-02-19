@@ -1,8 +1,6 @@
 # sykefravarsstatistikk-crm
 Script for å importere sykefraværsstatistikk fra datavarehus. Ref: https://github.com/navikt/sykefravarsstatistikk-api
 
-## Hente hva som er siste kvartal
-
 ```
 SELECT orgnr,
        max(CONCAT(ARSTALL, KVARTAL)) as siste_kvartal,
@@ -15,36 +13,23 @@ group by orgnr;
 
 ```
 
-
 Alternativt legge inn ett tall som presenterer potensielle dagsverk.
 Index isteden for sykefravær som tar med seg bransjetall.
 Potensielt Sparte Dagsverk?
 
 ## Prosess  
-1. Leser Compaction Log inn i minnet
+1. Leser fil fra s3 inn i minnet
 2. Kjøre spørring mot DVH for alt og sammenligner rad for rad mot versjonen i minne.
-3. Skriver endringer til compaction log
-4. 
+3. Skriver endringer til fil i s3
 5. Kjøre spørring mot SF etter utdaterte records. Nullstille de utdaterte radene.
-6. 
 
 
-### Kafka stuff
-
-```
-kafka-console-consumer --bootstrap-server localhost:9092 --topic topic
-```
-
-
-Run before commit:
+Kjøre før commit for å slippe at lintern klager.
 ```
 ./gradlew formatKotlin
+./gradlew clean build
 ```
 
 ### Mottak i Salesforce
 https://github.com/navikt/crm-platform-integration/blob/master/force-app/main/default/classes/KafkaMessageHandler.cls
-
-
-###
-tapteDagsverkNaering / muligeDagsverkNaering = sykefraværsprosent
 

@@ -2,7 +2,6 @@ buildscript {
     ext.http4k_version = '3.200.0'
     ext.javax_annotation_version = '1.2'
     ext.junit5_version = '3.3.2'
-    ext.kotlin_loggin_version = '1.7.8'
     ext.kotlin_version = '1.3.61'
     ext.logback_version = '1.2.3'
     ext.logstash_encoder_version = '5.2'
@@ -48,13 +47,13 @@ configurations {
 }
 
 dependencies {
+    compile "com.amazonaws:aws-java-sdk-s3:1.11.703"
     compile "com.fasterxml.jackson.module:jackson-module-kotlin:2.10.+"
     compile "com.oracle.ojdbc:ojdbc8:19.3.0.0"
     compile 'com.github.seratch:kotliquery:1.3.0'
-    compile 'com.h2database:h2:1.4.197'
+    compile 'javax.xml.bind:jaxb-api:2.3.1'
     compileOnly "javax.annotation:javax.annotation-api:$javax_annotation_version"
     implementation "ch.qos.logback:logback-classic:$logback_version"
-    implementation "io.github.microutils:kotlin-logging:$kotlin_loggin_version"
     implementation "io.prometheus:simpleclient_common:$prometheus_version"
     implementation "io.prometheus:simpleclient_hotspot:$prometheus_version"
     implementation "net.logstash.logback:logstash-logback-encoder:$logstash_encoder_version"
@@ -63,7 +62,8 @@ dependencies {
     implementation "org.http4k:http4k-server-netty:$http4k_version"
     implementation "org.jetbrains.kotlin:kotlin-script-runtime:1.3.61"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    implementation "com.amazonaws:aws-java-sdk-s3:1.11.703"
+    testCompile "com.github.tomakehurst:wiremock-jre8:2.26.0"
+    testCompile 'com.h2database:h2:1.4.197'
     testImplementation "io.findify:s3mock_2.12:0.2.5"
     testImplementation "io.kotlintest:kotlintest-runner-junit5:$junit5_version"
 }

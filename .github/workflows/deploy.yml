@@ -1,6 +1,17 @@
 name: Build, push, and deploy
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - '*'
+  pull_request:
+    branches:
+      - master
+  page_build:
+  release:
+    types:
+      - created
+
 
 env:
   IMAGE: docker.pkg.github.com/${{ github.repository }}/default:${{ github.sha }}
@@ -64,6 +75,7 @@ jobs:
   deploy-dev:
     name: Deploy to nais dev-fss
     needs: build
+    if: github.ref == 'refs/heads/master' && github.event_name != 'release'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
@@ -71,17 +83,17 @@ jobs:
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-fss
-          RESOURCE: .nais/dev.yaml
+          RESOURCE: .nais/dev-fss.yaml
 
-#  deploy-prod:
-#    name: Deploy to NAIS prod
-#    needs: deploy-dev
-#    if: github.ref == 'refs/heads/master'
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v1
-#      - uses: nais/deploy/actions/deploy@v1
-#        env:
-#          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-#          CLUSTER: prod-sbs
-#          RESOURCE: .nais/prod.yaml
+  deploy-prod:
+    name: Deploy to nais prod-fss
+    needs: build
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: prod-fss
+          RESOURCE: .nais/prod-fss.yaml

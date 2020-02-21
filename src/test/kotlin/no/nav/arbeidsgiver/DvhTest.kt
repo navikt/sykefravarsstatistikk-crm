@@ -41,7 +41,7 @@ class DvhTest : StringSpec() {
             println(potensielleDagsverk)
             potensielleDagsverk[0].orgnr shouldBe "987654321"
             potensielleDagsverk[0].potensielleDagsverk shouldBe 2000
-            potensielleDagsverk[0].muligeDagsverk shouldBe 12000
+            potensielleDagsverk[0].muligeDagsverk shouldBe 12006
             potensielleDagsverk[0].tapteDagsverk shouldBe 3600
         }
 

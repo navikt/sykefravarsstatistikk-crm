@@ -75,7 +75,7 @@ group by orgnr, naring
                 row.string("naring"),
                 row.int("antall_kvartaler"),
                 row.int("sum_tapte_dagsverk"),
-                row.int("sum_mulige_dagsverk")
+                row.int("sum_mulige_dagsverk") + 1
             )
             val sykefravarRadNaring =
                 sykefravarNaring[sykefravarRadOrg.naring] ?: SykefravarRadNaring(sykefravarRadOrg.naring)

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import java.net.URI
 import java.util.*
+import net.logstash.logback.argument.StructuredArguments
 import no.nav.arbeidsgiver.model.SfAccessToken
 import no.nav.arbeidsgiver.model.SfKafkaMessage
 import no.nav.arbeidsgiver.model.SykefravarLeadScoring
@@ -16,6 +17,7 @@ import org.apache.http.impl.client.HttpClients
 import org.http4k.client.ApacheClient
 import org.http4k.core.Method
 import org.http4k.core.Request
+import org.http4k.core.Response
 import org.http4k.core.Status
 import org.http4k.core.body.form
 import org.slf4j.LoggerFactory
@@ -74,7 +76,6 @@ object SalesforceClient {
     private fun createAuthorizedRequest(method: Method, endpointPath: String): Request {
         val token = getCachedToken()
         val endpointUri = token.instanceUrl.toString() + endpointPath
-        log.info("Making request: $endpointUri")
         return Request(method, endpointUri)
             .header("Authorization", token.tokenType + " " + token.accessToken)
             .header("Content-Type", "application/json;charset=UTF-8")
@@ -95,9 +96,10 @@ object SalesforceClient {
             ) else ApacheClient()
 
     fun getAccountById(accountId: String): String {
-        val request = createAuthorizedRequest(Method.GET, ENDPOINT_ACCOUNT + accountId)
+        val endpointPath = ENDPOINT_ACCOUNT + accountId
+        val request = createAuthorizedRequest(Method.GET, endpointPath)
         val result = getHTTPClient()(request)
-        log.info("Got response: ${result.bodyString().length}")
+        requestLogger(endpointPath, result)
         return result.bodyString()
     }
 
@@ -105,17 +107,17 @@ object SalesforceClient {
     fun querySalesforce(sosql: String): String {
         val request = createAuthorizedRequest(Method.GET, ENDPOINT_QUERY)
             .query("q", sosql)
-        val result = getHTTPClient()(request)
-        log.info("Got response : length $result")
-        return result.bodyString()
+        val response = getHTTPClient()(request)
+        requestLogger(ENDPOINT_QUERY, response)
+        return response.bodyString()
     }
 
     fun postSObject(jsonString: String): String {
         val request = createAuthorizedRequest(Method.POST, ENDPOINT_SOBJECTS)
             .body(jsonString)
-        val result = getHTTPClient()(request)
-        log.info("Response length: " + result.bodyString().length)
-        return result.bodyString()
+        val response = getHTTPClient()(request)
+        requestLogger(ENDPOINT_SOBJECTS, response)
+        return response.bodyString()
     }
 
     fun createSObject(topic: String, value: Any, key: String = UUID.randomUUID().toString()): SfKafkaMessage {
@@ -135,5 +137,21 @@ object SalesforceClient {
         }
         val records = mapOf("records" to sObjects)
         return Utils.toJson(records).toString()
+    }
+
+    private fun requestLogger(endpointPath: String, response: Response) {
+        if (response.status !== Status.OK) {
+            log.info(
+                "Status " + response.status + ", length: " + response.bodyString().length,
+                StructuredArguments.value("body", response.bodyString()),
+                StructuredArguments.value("endpoint", endpointPath)
+            )
+        } else {
+            log.warn(
+                "Status " + response.status + ", length: " + response.bodyString().length,
+                StructuredArguments.value("body", response.bodyString()),
+                StructuredArguments.value("endpoint", endpointPath)
+            )
+        }
     }
 }

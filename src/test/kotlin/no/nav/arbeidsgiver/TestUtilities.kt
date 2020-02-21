@@ -39,7 +39,9 @@ object TestUtilities {
         )
         wireMockServer.stubFor(
             WireMock.post(SalesforceClient.ENDPOINT_SOBJECTS).willReturn(
-                WireMock.aResponse().withBody("{}")
+                WireMock.aResponse().withBody("""{
+                    "some":"data"
+                    }""".trimMargin())
             )
         )
         wireMockServer.start()

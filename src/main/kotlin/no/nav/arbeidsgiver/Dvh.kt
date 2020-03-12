@@ -15,11 +15,9 @@ object Dvh {
         return sessionOf(ev.dvhUrl, ev.dvhUser, ev.dvhPassword)
     }
 
-    fun extractStatsNaering(femsiffer: Boolean = false): HashMap<String, SykefravarRadNaring> {
+    fun extractStatsNaering(): HashMap<String, SykefravarRadNaring> {
         val output = HashMap<String, SykefravarRadNaring>()
-        var sql: String
-        if (femsiffer) {
-            sql = """
+        val sql = """
 select naering_kode                             as naring,
        count(distinct concat(arstall, kvartal)) as antall_kvartaler,
        sum(taptedv)                             as sum_tapte_dagsverk,
@@ -27,20 +25,8 @@ select naering_kode                             as naring,
 from dt_p.agg_ia_sykefravar_naring_kode
 where concat(arstall, kvartal) >
       ((select max(concat(arstall, kvartal)) from dt_p.agg_ia_sykefravar_naring_kode) - 30)
-group by naring
+group by naering_kode
             """.trimMargin()
-        } else {
-            sql = """
-select naring                                   as naring,
-       count(distinct concat(arstall, kvartal)) as antall_kvartaler,
-       sum(taptedv)                             as sum_tapte_dagsverk,
-       sum(muligedv)                            as sum_mulige_dagsverk
-from dt_p.v_agg_ia_sykefravar
-where concat(arstall, kvartal) >
-      ((select max(concat(arstall, kvartal)) from dt_p.v_agg_ia_sykefravar) - 30)
-group by naring
-            """.trimMargin()
-        }
         getSession().forEach(queryOf(sql)) { row ->
             val stats = SykefravarRadNaring(
                 row.string("naring"),
@@ -59,14 +45,14 @@ group by naring
     ) {
         val sql = """
 select orgnr                                    as orgnr,
-       naring                                   as naring,
+       naering_kode                             as naring,
        count(distinct concat(arstall, kvartal)) as antall_kvartaler,
        sum(taptedv)                             as sum_tapte_dagsverk,
        sum(muligedv)                            as sum_mulige_dagsverk
-from dt_p.v_agg_ia_sykefravar
+from dt_p.agg_ia_sykefravar_v
 where concat(arstall, kvartal) >
-      ((select max(concat(arstall, kvartal)) from dt_p.v_agg_ia_sykefravar) - 30)
-group by orgnr, naring
+      ((select max(concat(arstall, kvartal)) from dt_p.agg_ia_sykefravar_v) - 30)
+group by orgnr, naering_kode
             """.trimMargin()
 
         getSession().forEach(queryOf(sql)) { row ->

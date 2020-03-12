@@ -14,7 +14,7 @@ on:
 
 
 env:
-  IMAGE: docker.pkg.github.com/${{ github.repository }}/default:${{ github.sha }}
+  IMAGE: docker.pkg.github.com/${{ github.repository }}/${{ github.event.repository.name }}:${{ github.sha }}
 
 jobs:
   test:
@@ -75,7 +75,7 @@ jobs:
   deploy-dev:
     name: Deploy to nais dev-fss
     needs: build
-    if: github.ref == 'refs/heads/master' && github.event_name != 'release'
+    if: github.ref == 'refs/heads/develop-new-stuff' && github.event_name != 'release'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
@@ -87,7 +87,8 @@ jobs:
 
   deploy-prod:
     name: Deploy to nais prod-fss
-    needs: build
+    needs: test
+    #if: github.ref == 'refs/heads/develop-new-stuff'
     if: github.event_name == 'release'
     runs-on: ubuntu-latest
     steps:

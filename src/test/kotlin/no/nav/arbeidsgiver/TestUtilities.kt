@@ -16,7 +16,6 @@ object TestUtilities {
 
     fun startS3Mock(port: Int) {
         val api = S3Mock.Builder().withPort(port).withInMemoryBackend().build()
-
         api.start()
     }
 
@@ -39,7 +38,9 @@ object TestUtilities {
         )
         wireMockServer.stubFor(
             WireMock.post(SalesforceClient.ENDPOINT_SOBJECTS).willReturn(
-                WireMock.aResponse().withBody("{}")
+                WireMock.aResponse().withBody("""{
+                    "some":"data"
+                    }""".trimMargin())
             )
         )
         wireMockServer.start()

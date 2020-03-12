@@ -40,7 +40,7 @@ class DvhTest : StringSpec() {
             }, Dvh.extractStatsNaering())
             println(potensielleDagsverk)
             potensielleDagsverk[0].orgnr shouldBe "987654321"
-            potensielleDagsverk[0].potensielleDagsverk shouldBe 2000
+            potensielleDagsverk[0].potensielleDagsverk shouldBe 752
             potensielleDagsverk[0].muligeDagsverk shouldBe 12000
             potensielleDagsverk[0].tapteDagsverk shouldBe 3600
         }
@@ -58,9 +58,9 @@ class DvhTest : StringSpec() {
             naringStat shouldNotBe null
             if (naringStat != null) {
                 naringStat.naring shouldBe "88911"
-                naringStat.antallKvartaler shouldBe 2
-                naringStat.tapteDagsverk shouldBe 1600
-                naringStat.muligeDagsverk shouldBe 6000
+                naringStat.antallKvartaler shouldBe 3
+                naringStat.tapteDagsverk shouldBe 828
+                naringStat.muligeDagsverk shouldBe 3700
             }
         }
     }

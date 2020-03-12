@@ -15,7 +15,7 @@ class CalcTest : StringSpec() {
             potensielle.muligeDagsverk shouldBe 10000
             potensielle.tapteDagsverk shouldBe 2000
             potensielle.orgnr shouldBe "123"
-            potensielle.potensielleDagsverk shouldBe 1500
+            potensielle.potensielleDagsverk shouldBe 500
         }
         "skal takle bransjer uten data" {
             val sykefravarRadOrg = SykefravarRadOrg("123", "123", 12, 2000, 10000)

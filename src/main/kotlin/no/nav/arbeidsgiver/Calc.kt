@@ -19,7 +19,8 @@ object Calc {
         // println("Targetfravær: $targetFravaer")
         var potensieltFravaer = 0
         if (naeringFravaer > 0) {
-            potensieltFravaer = (tapteDagsverk - targetFravaer).toInt()
+            // Deler på tre for å få ut årlig potensielt fravær
+            potensieltFravaer = (tapteDagsverk - targetFravaer).toInt() / 3
         }
         return SykefravarLeadScoring(
             statsOrg.orgnr,

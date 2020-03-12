@@ -9,8 +9,12 @@ object Bootstrap {
     private val log = LoggerFactory.getLogger(javaClass)
 
     fun start(ev: EnvVar = EnvVarFactory.envVar) {
-        Server.create(ev)
-        work()
+        try {
+            Server.create(ev)
+            work()
+        } catch (t: Throwable) {
+            log.error(t.cause.toString(), t)
+        }
     }
 
     private fun work() {

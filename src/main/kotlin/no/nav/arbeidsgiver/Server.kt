@@ -38,7 +38,7 @@ object Server {
         }
         val salesforceQueryTasksHandler: HttpHandler = { _ ->
             val data =
-                SalesforceClient.querySalesforce("SELECT AccountId,Id,OwnerId,Description,CreatedDate,Subject from Task")
+                SalesforceClient.querySalesforce("SELECT AccountId,Id,OwnerId,CreatedDate,Subject from Task")
             conditionalResponse(inDev, data)
         }
         val indexHandler: HttpHandler = { _ ->
